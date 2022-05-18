@@ -1,0 +1,35 @@
+version: "3.8"
+services:    
+  db:
+    image: postgres:14.2
+    restart: always
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=ThisIsAREALLYSecurePassword
+      - POSTGRES_DB=tyba-test
+    ports:
+      - '5432:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./db/initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
+
+  app:
+    build: ./app
+    depends_on:
+        - db
+    ports:
+      - '3000:3000'
+    environment:
+      - PGHOST=db
+      - PGUSER=test
+      - PGPASSWORD=ThisIsAREALLYSecurePassword
+      - PGDATABASE=tyba-test
+      - PGPORT=5432
+      - PORT=3000
+      - JWT_SECRET=This1sRad0mBel1ev3Me
+      - GOOGLE_KEY={aqui c:}
+    links:
+      - db
+volumes:
+  db:
+    driver: local

@@ -1,0 +1,76 @@
+/**
+ * Import the required packages for the app.
+ */
+const http = require('http');
+var app = require('../app'); // Main app
+
+// Load the env config
+require('dotenv').config();
+
+/**
+ * Get port from the environment file and set it to the app.
+ */
+ let port = normalizePort( process.env.PORT || '3000');
+ app.set('port', port);
+ 
+ // Create the http server. (should be HTTPS as we're managing credentials, but I don't have a certificate)
+ let server = http.createServer( app );
+ server.listen( port );
+ server.on( 'error', onError );
+ server.on( 'listening', onListening );
+ 
+ 
+/**
+ * ------------------------------------------------------------
+ * Auxiliar functions
+ * ------------------------------------------------------------
+ */
+
+/**
+ * Checks and converts the port value to check if a valid value was given.
+ * @param {string} val The port number.
+ * @returns The port number as an int, or named pipe. If none of this where given, returns false to prevent the server start up.
+ */
+function normalizePort( val ){
+  var port = parseInt(val, 10);
+
+  if( isNaN( port ) ) 
+    return val;
+  if( port >= 0 ) 
+    return port;
+
+  return false;
+}
+
+/**
+ * If an error occurs when launching the server, notify the error.
+ * @param {*} error Error thrown by the http server.
+ */
+function onError( error ){
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
+
+  // Check the error codes and display a readable error.
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+    default:
+      throw error; // If is not this error, just throw the error again.
+  }
+}
+
+/**
+ * Display the server information in the debug console.
+ */
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
+  console.debug( "listening on:" + bind );
+}
